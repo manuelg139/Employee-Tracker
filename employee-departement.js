@@ -34,44 +34,29 @@ const runPrompts = () => {
         type: "list",
         message: "What would you like to do?",
         choices: [
-            "View All Employees",
-            "View Departments",
-            "View Managers",
-            "Add Employee", 
-            "Remove Employee",
-            "Update Employee Role", 
-            "Update Employee Manger", 
+            "View Records",
+            "Add Records", 
+            "Update Records",
+            "Remove Records",
             "Exit"]
         })
         .then((answer) => {
             switch (answer.action) {
 
-                case "View All Employees":
-                    viewEmployees();
+                case  "View Records":
+                    viewRecords();
                     break;
-                case "View Departments":
-                    viewDepartments();
+
+                case "Add Records":
+                    addRecords();
+                    break;
+
+                case "Update Records":
+                    updateRecords();
                     break;
                 
-                case "View Managers":
-   
-                    viewManagers();
-                    break;
-
-                case "Add Employee":
-                    addEmployee();
-                    break;
-
-                case "Remove Employee":
-                    removeEmployee();
-                    break;
-
-                case "Update Employee Role":
-                    updateEmployee();
-                    break;
-
-                case "Update Employee Manager":
-                    updateManager();
+                case "Remove Records":
+                    renoveRecords();
                     break;
 
                 case "Exit":
@@ -79,6 +64,54 @@ const runPrompts = () => {
     };
     });
 };
+
+
+
+// ? VIEW RECORDS PROMPTS AND FUNCTIONS //
+const viewRecords = () => {
+    inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "Which Records would you like to display?",
+        choices: [
+            "View All Employees",
+            "View All Employees by Manger",
+            "View All Roles",
+            "View All Departments",
+            "Back to Menu",
+            "Exit"]
+        })
+        .then((answer) => {
+            switch (answer.action) {
+                
+                case "View All Employees":
+
+                    viewEmployees();
+                    break;
+
+                case "View All Employees by Manger":
+                    viewByManger();
+                    break;
+
+                case "View All Roles":
+                        viewRoles();
+                        break;
+
+                case  "View All Departments":
+                    viewDepartments();
+                    break;
+
+                case "Back to Menu":
+                    runPrompts();
+                        break;
+
+                case "Exit":
+                    console.log("Goodbye");
+                };
+            });
+        };
+        
 
 
 
@@ -103,7 +136,20 @@ const viewDepartments = () => {
     });
 };
 
-const viewManagers = () => {
+
+const viewRoles = () => {
+    const query = "SELECT id, title, salary FROM role"
+    connection.query(query, (err, res) => {
+        res.forEach(({id, title, salary})=> {
+            console.log(`ID: ${id}|| Tile: ${title}|| Salary: ${salary}`)
+        });
+    runPrompts();
+    });
+};
+
+
+
+const viewByManger = () => {
     const query = "SELECT id, first_name, last_name, manager_id FROM employee"
     connection.query(query, (err, res) => {
         res.forEach(({id, first_name, last_name})=> {
@@ -115,8 +161,65 @@ const viewManagers = () => {
 
 
 
+
+
+
+
+
+
+
+
+// ? ADD RECORDS PROMPTS AND FUNCTIONS //
+const addRecords = () => {
+    inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "What type of record would you like to add?",
+        choices: [
+            "Add Employee",
+            "Add Role",
+            "Add Department",
+            "Back to Menu",
+            "Exit"]
+        })
+        .then((answer) => {
+            switch (answer.action) {
+                
+                case  "Add Employee":
+                    addEmployee();
+                    break;
+
+                case "Add Role":
+                    viewRoles();
+                    break;
+
+                case  "Add Department":
+                    viewDepartments();
+                    break;
+
+                case "Back to Menu":
+                    runPrompts();
+                        break;
+
+                case "Exit":
+                    console.log("Goodbye");
+                };
+            });
+        };
+        
+
+
+
+
+
+
+
+
+
+
 const addEmployee = async () => {
-    const query = "SELECT id,title FROM role;"
+    const query = "SELECT id, title FROM role;"
     const rolesResponse = await connection.query(query);
     const roleRes = [rolesResponse].map(role => {
         return {
@@ -136,7 +239,7 @@ const addEmployee = async () => {
           type: 'input',
           message: 'What is the employees last name?'
         },
-       
+        
         {
             name: "role",
             type: "list",
