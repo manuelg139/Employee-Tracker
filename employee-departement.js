@@ -1,5 +1,9 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+var util = require("util");
+require("console.table");
+require('dotenv').config()
+
 
 
 // CREDENTIALS FOR CONNECTION
@@ -31,8 +35,8 @@ const runPrompts = () => {
         message: "What would you like to do?",
         choices: [
             "View All Employees",
-            "View All Employees By Department",
-            "View All Employees By Manager",
+            "View Departments",
+            "View Managers",
             "Add Employee", 
             "Remove Employee",
             "Update Employee Role", 
@@ -45,12 +49,13 @@ const runPrompts = () => {
                 case "View All Employees":
                     viewEmployees();
                     break;
-                case "View All Employees By Department":
+                case "View Departments":
                     viewDepartments();
                     break;
                 
-                case "View All Employees By Manager":
-                    viewMangers();
+                case "View Managers":
+   
+                    viewManagers();
                     break;
 
                 case "Add Employee":
@@ -78,24 +83,92 @@ const runPrompts = () => {
 
 
 const viewEmployees = () => {
-    console.log("viewEmployees DATA");
+    const query = "SELECT id, first_name, last_name, role_id FROM employee"
+    connection.query(query, (err, res) => {
+        res.forEach(({id, first_name, last_name})=> {
+            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`)
+        });
     runPrompts();
+    });
 };
+
 
 const viewDepartments = () => {
-    console.log("viewDepartments DATA");
+    const query = "SELECT id, name FROM departments"
+    connection.query(query, (err, res) => {
+        res.forEach(({id, name})=> {
+            console.log(`ID: ${id}|| Name: ${name}`)
+        });
     runPrompts();
+    });
 };
 
-const viewMangers = () => {
-    console.log("viewMangers DATA");
+const viewManagers = () => {
+    const query = "SELECT id, first_name, last_name, manager_id FROM employee"
+    connection.query(query, (err, res) => {
+        res.forEach(({id, first_name, last_name})=> {
+            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`)
+        });
     runPrompts();
+    });
 };
 
-const addEmployee = () => {
-    console.log("addEmployee DATA");
-    runPrompts();
+
+
+const addEmployee = async () => {
+    const query = "SELECT id,title FROM role;"
+    const rolesResponse = await connection.query(query);
+    const roleRes = [rolesResponse].map(role => {
+        return {
+            value: role.id,
+            name: role.title
+        };
+    });
+        
+    inquirer.prompt([
+        {
+          name: 'firstName',
+          type: 'input',
+          message: 'What is the employees first name?'
+        },
+        {
+          name: 'lastName',
+          type: 'input',
+          message: 'What is the employees last name?'
+        },
+       
+        {
+            name: "role",
+            type: "list",
+            message: "What is this employees role?",
+            choices: roleRes
+        },
+        
+        {
+          name: 'managerId',
+          type: 'input',
+          message: 'What is the employees managers ID?'
+        }
+      ])
+      .then((data)=>{
+        connection.query('INSERT INTO employee SET ?',
+        {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          role_id: data.roleId,
+          manager_id: data.managerId
+        },
+        (err, res) => {
+          if (err) throw err;
+            // affectedrows calls on the rows affected
+          console.log(`Employee ${data.firstName}  ${data.lastName} inserted!\n`);
+          runPrompts();
+        
+      })
+    })
+   
 };
+
 
 const removeEmployee = () => {
     console.log("removeEmployee DATA");
