@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/manuelg139/Employee-Tracker#readme",
   "dependencies": {
+    "ascii-art-table": "^1.0.1",
     "console.table": "^0.10.0",
     "dotenv": "^8.2.0",
     "inquirer": "^8.0.0",

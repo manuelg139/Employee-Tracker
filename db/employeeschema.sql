@@ -5,18 +5,18 @@ USE employeeTracker_DB;
 
 
 /* ADDING DEPARTMENTS */
-INSERT INTO departments (name)
+INSERT INTO departments (department_name, department_lead)
 VALUES 
-("Engineering"), 
-("Sales"), 
-("Customer Service");
+("Engineering", "Natelie"), 
+("Sales", "Molly"), 
+("Customer Service", "Walter");
 
 /* ADDING ROLES */
-INSERT INTO role (title, salary, department_id)
+INSERT INTO role (title, salary, department)
 VALUES 
-("Software Engineer", 120000, 1),
-("Sales Representative", 80000, 2),
-("Customer Success Representative", 55000.00, 3);
+("Software Engineer", 120000, "Engineering"),
+("Sales Representative", 80000, "Sales"),
+("Customer Success Representative", 55000.00, "Customer Service");
 
 
 /* ADDING EMPLOYEES */
