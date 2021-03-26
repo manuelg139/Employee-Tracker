@@ -5,7 +5,6 @@ require("console.table");
 require('dotenv').config()
 
 
-
 // CREDENTIALS FOR CONNECTION
 const connection = mysql.createConnection({
     host: "localhost",
@@ -110,21 +109,17 @@ const viewRecords = () => {
                     console.log("Goodbye");
                 };
             });
-        };
+};
         
-
-
-
 const viewEmployees = () => {
-    const query = "SELECT id, first_name, last_name, role_id FROM employee"
+    const query = "SELECT id, first_name, last_name, role_title FROM employee"
     connection.query(query, (err, res) => {
-        res.forEach(({id, first_name, last_name})=> {
-            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`)
+        res.forEach(({id, first_name, last_name , role_title})=> {
+            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}  || Title: ${role_title}` ) 
         });
     runPrompts();
     });
 };
-
 
 const viewDepartments = () => {
     const query = "SELECT id, name FROM departments"
@@ -136,7 +131,6 @@ const viewDepartments = () => {
     });
 };
 
-
 const viewRoles = () => {
     const query = "SELECT id, title, salary FROM role"
     connection.query(query, (err, res) => {
@@ -146,8 +140,6 @@ const viewRoles = () => {
     runPrompts();
     });
 };
-
-
 
 const viewByManger = () => {
     const query = "SELECT id, first_name, last_name, manager_id FROM employee"
@@ -191,11 +183,11 @@ const addRecords = () => {
                     break;
 
                 case "Add Role":
-                    viewRoles();
+                    addRole();
                     break;
 
                 case  "Add Department":
-                    viewDepartments();
+                    addDepartment();
                     break;
 
                 case "Back to Menu":
@@ -209,26 +201,12 @@ const addRecords = () => {
         };
         
 
-
-
-
-
-
-
-
-
-
-const addEmployee = async () => {
-    const query = "SELECT id, title FROM role;"
-    const rolesResponse = await connection.query(query);
-    const roleRes = [rolesResponse].map(role => {
-        return {
-            value: role.id,
-            name: role.title
-        };
-    });
+const addEmployee = () => {
+    connection.query('SELECT * FROM role', async (err, results) => {
+        if (err) throw err;
+   
         
-    inquirer.prompt([
+   await inquirer.prompt([
         {
           name: 'firstName',
           type: 'input',
@@ -241,39 +219,133 @@ const addEmployee = async () => {
         },
         
         {
-            name: "role",
-            type: "list",
-            message: "What is this employees role?",
-            choices: roleRes
+            name: 'roleTitle',
+            type: 'list',
+            message: `What is this employees role?
+            `,
+            choices: [
+                "Software Engineer",
+                "Sales Representative",
+                "Customer Success Representative",
+            ]
+
         },
         
         {
-          name: 'managerId',
+          name: 'manager',
           type: 'input',
-          message: 'What is the employees managers ID?'
+          message: 'What is the employees managers name?'
         }
       ])
-      .then((data)=>{
+      .then((answer)=>{
         connection.query('INSERT INTO employee SET ?',
         {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role_id: data.roleId,
-          manager_id: data.managerId
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+          role_title : answer.roleTitle,
+          manager: answer.manager,
         },
         (err, res) => {
           if (err) throw err;
             // affectedrows calls on the rows affected
-          console.log(`Employee ${data.firstName}  ${data.lastName} inserted!\n`);
+          console.log(`Employee ${answer.firstName}  ${answer.lastName} inserted!\n`);
           runPrompts();
-        
-      })
-    })
-   
+        });
+    });
+});
 };
 
 
-const removeEmployee = () => {
+const addRole = () => {
+    connection.query('SELECT * FROM role', async (err, results) => {
+        if (err) throw err;
+   
+        
+   await inquirer.prompt([
+        {
+          name: 'rolenName',
+          type: 'input',
+          message: 'What is the name of the role?'
+        },
+        {
+          name: 'roleSalary',
+          type: 'input',
+          message: 'What is the employees last name?'
+        },
+        {
+            name: 'roleSalary',
+            type: 'input',
+            message: 'What is the employees last name?'
+          },
+        
+        
+        
+        {
+          name: 'manager',
+          type: 'input',
+          message: 'What is the employees managers name?'
+        }
+      ])
+      .then((answer)=>{
+        connection.query('INSERT INTO role SET ?',
+        {
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+          role_title : answer.roleTitle,
+          manager: answer.manager,
+        },
+        (err, res) => {
+          if (err) throw err;
+            // affectedrows calls on the rows affected
+          console.log(`Employee ${answer.firstName}  ${answer.lastName} inserted!\n`);
+          runPrompts();
+        });
+    });
+});
+};
+
+
+
+
+
+
+
+
+// ? UPDATE RECORDS PROMPTS AND FUNCTIONS //
+const updateRecords = () => {
+    inquirer
+        .prompt([
+            {
+                name: 'updateRecords',
+                type: 'list',
+                message: 'Select the Records you want to update',
+                choices: ['Employee Records', 'Current Roles', 'Departments']
+            },
+        ])
+        .then((answer) => {
+            switch (answer.updateRecords) {
+                case 'Employee Records':
+                    updateEmployee();
+                    break;
+
+                case 'Current Roles':
+                    updateRoles();
+                    break;
+
+                case 'Departments':
+                    updateDepartment();
+                    break;
+
+                default:
+                    console.log(`Invalid action: ${answer.updaterec}`)
+
+            };
+        });
+
+};
+
+
+/* const removeEmployee = () => {
     console.log("removeEmployee DATA");
     runPrompts();
 };
@@ -286,4 +358,4 @@ const updateEmployee = () => {
 const updateManager = () => {
     console.log("updateManager DATA");
     runPrompts();
-};
+}; */

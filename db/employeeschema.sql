@@ -20,9 +20,9 @@ VALUES
 
 
 /* ADDING EMPLOYEES */
-INSERT INTO employee (first_name, last_name, role_id)
+INSERT INTO employee (first_name, last_name, role_title, manager)
 VALUES 
-("Manuel", "Gonzalez", 1 ),
-("Adriana", "Romero", 2 ),
-("Julian", "Perez", 3);
+("Manuel", "Gonzalez", "Software Engineer", "Natelie"),
+("Adriana", "Romero", "Sales Representative", "Molly" ),
+("Julian", "Perez", "Customer Success Representative", "Walter" )
 
