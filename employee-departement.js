@@ -1,9 +1,9 @@
+require('dotenv').config()
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 var util = require("util");
 require("console.table");
-require('dotenv').config()
-/* const Font = require('ascii-art-font'); */
+
 
 
 // CREDENTIALS FOR CONNECTION
@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: process.env.PASSWORD,
+    password: process.env.DB_PW,
   database: "employeeTracker_DB"
 });
 
@@ -384,9 +384,10 @@ const updateRecords = () => {
 
 };
 
-const updateEmployee = () => {
-    inquirer
-        .prompt([
+const updateEmployee = async () => {
+    try {
+        const employeeUpdate = await inquirer
+            .prompt([
             {
                 name: 'firstname',
                 type: 'input',
@@ -397,18 +398,21 @@ const updateEmployee = () => {
                 type: 'input',
                 message: 'What is the last name of the employee you would you like to update?'
             },
-           /*  {
-                name: 'updatefield',
+            {
+                name: 'updateAnswers',
                 type: 'list',
                 message: 'What field would you like to update?',
                 choices: ['first_name', 'last_name', 'job_title', 'manager',],
-            }, */
-           /*  {
+            },
+
+            {
                 name: 'updatedinfo',
                 type: 'input',
                 message: 'Enter the new information.',
-            }, */
-            {
+            }, 
+
+
+            /* {
                 name: 'firstName',
                 type: 'input',
                 message: 'What is the employees first name?'
@@ -436,8 +440,51 @@ const updateEmployee = () => {
                 name: 'manager',
                 type: 'input',
                 message: 'What is the employees managers name?'
-              }
+              } */
         ])
+         let updateAnswers = employeeUpdate.updateAnswers;
+         let updatedInfo = employeeUpdate.updatedinfo;
+         let firstName = employeeUpdate.firstname; 
+         let lastName = employeeUpdate.lastname; 
+         let query;
+         console.log(employeeUpdate);
+
+        switch (updateAnswers) {
+            case 'first_name':
+                query = `UPDATE employee SET first_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                break;
+
+
+             case 'last_name':
+                query = `UPDATE employee SET last_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                break;
+
+            case 'job_title':
+                query = `UPDATE employee SET job_title = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                break;
+
+            case 'manager':
+                query = `UPDATE employee SET manager = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                break;
+
+            default:
+                console.log(`Cannot update ${updateAnswers}`);
+        };
+        console.log(query);
+
+        connection.query(query, async (err, res) => {
+            if (err) throw err;
+            await console.table(`${res.affectedRows} record updated!\n`);
+            console.log(`Employee ${employeeUpdate.firstname}${employeeUpdate.lastname} was updated!\n`);
+            
+            runPrompts();
+        });
+    } catch (error) { console.log(error) };
+
+    };
+
+/* 
+
         .then((answer) => {
             connection.query('UPDATE INTO employee SET ? WHERE (first_name, last_name)',
                 {
@@ -452,8 +499,8 @@ const updateEmployee = () => {
                 console.log(`Employee ${answer.firstName}  ${answer.lastName} was updated!\n`);
                 runPrompts();
                 });
-            });
-};
+            }); */
+
 
 
 const updateRoles = () => {
@@ -511,7 +558,6 @@ const updateRoles = () => {
                     async (err, res) => {
                         if (err) throw err;
                         await console.table(`${res.affectedRows} record updated!\n`);
-                        console.log(title)
                       
                     });
             });
@@ -520,61 +566,130 @@ const updateRoles = () => {
 
 
 
-const updateDepartment = () => {
-    connection.query('SELECT * FROM departments', async (err, results) => {
-        if (err) throw err;
-        await inquirer
-            .prompt([
-                {
-                    name: 'department',
-                    type: 'list',
-                    message: 'Which deparment would you like to update?',
-                    choices() {
 
-                        //creating an array to push titles into 
-                        const updateDepArray = [];
-                        //loop to push titles into the array
-                        results.forEach(({ department_name }) => {
-                            updateDepArray.push(department_name);
-                        });
-                        //create var to add and display answers
-                        let updateDepartments = updateDepArray;
-                        return updateDepartments
-                    }
-                },
+const updateDepartment = async () => {
+    
+        connection.query('SELECT * FROM departments', async (err, results) => {
+            if (err) throw err;
+            /* const depUpdate = await inquirer */
 
-                {
-                    name: 'updateName',
-                    type: 'input',
-                    message: 'Update name for the Department.',
-                  
-                },
-
-                {
-                    name: 'updateLead',
-                    type: 'input',
-                    message: 'Update Lead for the Department.',
-                },
-                
-            ])
-            .then((answer) => {
-                const query = `UPDATE departments SET ${answer.updateName}, ${answer.updateLead} WHERE ?`
-                
-                //selecting where to add the new qiery
-                connection.query(query,
-                    
-                    [
+            await inquirer.prompt([
                         {
-                            department_name: answer.department,
+                            name: 'department',
+                            type: 'list',
+                            message: 'Which deparment would you like to update?',
+                            choices() {
+
+                                //creating an array to push titles into 
+                                const updateDepArray = [];
+                                //loop to push titles into the array
+                                results.forEach(({ department_name }) => {
+                                    updateDepArray.push(department_name);
+                                });
+                                //create var to add and display answers
+                                let updateDepartments = updateDepArray;
+                                return updateDepartments
+                            }
                         },
-                    ],
-                    async (err, res) => {
-                        if (err) throw err;
-                        await console.log(`${answer.department} deparment updated!!!\n`);
+
+                        {
+                            name: 'updateitem',
+                            type: 'list',
+                            message: 'What would you like to update?',
+                            choices: ['id', 'department_name', 'department_lead'],
+                        },
+
+                        {
+                            name: 'updateinfo',
+                            type: 'input',
+                            message: 'Enter the new information.',
+                        },
                         
+                    ])
+                    
+                    .then((depUpdate)=>{ 
+                        
+                        const query = `UPDATE departments SET ${depUpdate.updateitem} = '${depUpdate.updateinfo}' WHERE ?`
+                        
+                        //selecting where to add the new qiery
                       
+                        connection.query(query,
+                            [
+                                {
+                                    department_name: depUpdate.department,
+                                },
+                            ],
+                            async (err, res) => {
+                                if (err) throw err;
+                                await console.table(`${depUpdate.department} record updated!\n`)
+                                await console.table('NEW '+ depUpdate.updateitem + ' -- ' + depUpdate.updateinfo )
+                                
+                                runPrompts();
+                            }
+                        );
                     });
-            });
-    });
+        });            
 };
 
+
+// OTHER UPDATE CODE
+/* 
+const updateDepartment = async () => {
+    try {
+        connection.query('SELECT * FROM departments', async (err, results) => {
+            if (err) throw err;
+            const depUpdate = await inquirer
+                .prompt([
+                    {
+                        name: 'department',
+                        type: 'list',
+                        message: 'Which deparment would you like to update?',
+                        choices() {
+
+                            //creating an array to push titles into 
+                            const updateDepArray = [];
+                            //loop to push titles into the array
+                            results.forEach(({ department_name }) => {
+                                updateDepArray.push(department_name);
+                            });
+                            //create var to add and display answers
+                            let updateDepartments = updateDepArray;
+                            return updateDepartments
+                        }
+                    },
+
+                    {
+                        name: 'updateName',
+                        type: 'input',
+                        message: 'Update name for the Department.',
+                    
+                    },
+
+                    {
+                        name: 'updateLead',
+                        type: 'input',
+                        message: 'Update Lead for the Department.',
+                    },
+                    
+                ])
+                console.log(depUpdate)
+                    const query = `UPDATE departments SET ${depUpdate.updateName}, ${depUpdate.updateLead} WHERE ?`
+                    console.log(query)
+                    //selecting where to add the new qiery
+                    console.log(depUpdate.department)
+                    connection.query(query,
+                        [
+                            {
+                                department_name: depUpdate.department,
+                            },
+                        ],
+                        async (err, res) => {
+                            if (err) throw err;
+                            await console.table(`${res.affectedRows} record updated!\n`);
+                        }
+                    );
+        });
+    } catch (error) { console.log(error) }
+};
+
+ */
