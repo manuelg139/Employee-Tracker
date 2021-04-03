@@ -56,7 +56,7 @@ const runPrompts = () => {
                     break;
                 
                 case "Remove Records":
-                    renoveRecords();
+                    removeRecords();
                     break;
 
                 case "Exit":
@@ -593,8 +593,6 @@ const updateEmployee = async () => {
                 });
             }); */
 
-
-
 const updateRoles = () => {
     connection.query('SELECT * FROM role', async (err, results) => {
         if (err) throw err;
@@ -650,6 +648,7 @@ const updateRoles = () => {
                     async (err, res) => {
                         if (err) throw err;
                         await console.table(`${res.affectedRows} record updated!\n`);
+                        runPrompts();
                       
                     });
             });
@@ -781,3 +780,158 @@ const updateDepartment = async () => {
 };
 
  */
+
+
+
+
+
+
+
+// ? DELETE RECORDS PROMPTS AND FUNCTIONS //
+
+const removeRecords = () => {
+    inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "What type of record would you like to remove?",
+        choices: [
+            "Remove Employee",
+            "Remove Role",
+            "Remove Department",
+            "Back to Menu",
+            "Exit"]
+        })
+        .then((answer) => {
+            switch (answer.action) {
+                
+                case  "Remove Employee":
+
+                   connection.query('SELECT * FROM employee', (err, results) => {
+                    if (err) throw err;
+                    inquirer.prompt([
+                      {
+                        name: 'employee',
+                        type: 'list',
+                        choices() {
+                          //Creates the choice array
+                          const delEmpArray = []
+                          //populates the roles into the choice array
+                          results.forEach(({ id, first_name, last_name }) => {
+                            delEmpArray.push(`${id} ${first_name} ${last_name}`);
+                          })
+                          let deleteEmployee = delEmpArray;
+                          return deleteEmployee
+                        },
+                        message: 'Which employee would you like to remove?'
+                      }
+                    ])
+                      .then((answer) => {
+                        //This is going to allow us to split the employee ID and name into an array we will use the employee ID(employeeARR[0]) later
+                        const employeeArr = answer.employee.split(' ')
+                        // This is going to use the employee ID to remove the employee from the table
+                        connection.query('DELETE FROM employee WHERE ?',
+                          {
+                            id: employeeArr[0]
+                          },
+                          (err, res) => {
+                            if (err) throw err;
+                            console.log(`${answer.employee} deleted!\n`);
+            
+                            runPrompts();
+                          }
+                        )
+                      })
+                  })
+                  break;
+            
+                case "Remove Role":
+                    
+                   connection.query('SELECT * FROM role', (err, results) => {
+                    if (err) throw err;
+                    inquirer.prompt([
+                      {
+                        name: 'role',
+                        type: 'list',
+                        choices() {
+                          //Creates the choice array
+                          const delRoleArray = []
+                          //populates the roles into the choice array
+                          results.forEach(({ id, title, salary }) => {
+                            delRoleArray.push(`${id} ${title} ${salary}`);
+                          })
+                          let deleteRole = delRoleArray;
+                          return deleteRole
+                        },
+                        message: 'Which role would you like to remove?'
+                      }
+                    ])
+                      .then((answer) => {
+                        //This is going to allow us to split the employee ID and name into an array we will use the employee ID(employeeARR[0]) later
+                        const roleArr = answer.role.split(' ')
+                        // This is going to use the employee ID to remove the employee from the table
+                        connection.query('DELETE FROM role WHERE ?',
+                          {
+                            id: roleArr[0]
+                          },
+                          (err, res) => {
+                            if (err) throw err;
+                            console.log(`${answer.role} deleted!\n`);
+            
+                            runPrompts();
+                          }
+                        )
+                      })
+                  })
+                    break;
+
+                case  "Remove Department":
+                    
+                   connection.query('SELECT * FROM departments', (err, results) => {
+                    if (err) throw err;
+                    inquirer.prompt([
+                      {
+                        name: 'department',
+                        type: 'list',
+                        choices() {
+                          //Creates the choice array
+                          const delDepArray = []
+                          //populates the roles into the choice array
+                          results.forEach(({ id, department_name  }) => {
+                            delDepArray.push(`${id} ${department_name}`);
+                          })
+                          let deleteDep = delDepArray;
+                          return deleteDep
+                        },
+                        message: 'Which department would you like to remove?'
+                      }
+                    ])
+                      .then((answer) => {
+                        //This is going to allow us to split the employee ID and name into an array we will use the employee ID(employeeARR[0]) later
+                        const depArr = answer.department.split(' ')
+                        // This is going to use the employee ID to remove the employee from the table
+                        connection.query('DELETE FROM departments WHERE ?',
+                          {
+                            id: depArr[0]
+                          },
+                          (err, res) => {
+                            if (err) throw err;
+                            console.log(`${answer.department} deleted!\n`);
+            
+                            runPrompts();
+                          }
+                        )
+                      })
+                  })
+                    break;
+
+                case "Back to Menu":
+                    runPrompts();
+                        break;
+
+                case "Exit":
+                    console.log("Goodbye");
+                };
+            });
+        };
+    
