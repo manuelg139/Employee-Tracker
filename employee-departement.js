@@ -2,7 +2,8 @@ require('dotenv').config()
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 var util = require("util");
-require("console.table");
+const cTable = require('console.table');
+var figlet = require('figlet');
 
 
 
@@ -18,16 +19,47 @@ const connection = mysql.createConnection({
 
 
 // CONNECTING SERVER WITH MYSQL DB
-connection.connect(function(err) {
+connection.connect((err)  => {
+
     if (err) throw err;
-    console.log("Connected as ID " + connection.threadId);
+        figlet('Employee Tracker', function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.clear() 
+            console.log(data)
+            console.log('Welcome to the Employee Tracker you are connected as ID ' + connection.threadId);
+            console.log('Press the up or down arrow key to begin') 
+        });
+        tablelog();
+        runPrompts();
+    });
     // Kick off the prompts
-    runPrompts();
-  });
+   
+const tablelog = () => {
+    const query = `SELECT employee.id, employee.first_name, employee.last_name, employee.manager, role.title, role.salary, departments.department_name
+    FROM((role INNER JOIN employee ON role.title = employee.role_title)
+     INNER JOIN departments ON role.department = departments.department_name)`
+    connection.query(query, async (err, res) => {
+        if (err) throw err;
+        await console.table(res);
+    });
+};
+
+const roletablelog = () => {
+    const query = `SELECT role.id, role.title, role.salary, role.department FROM role `
+    connection.query(query, async (err, res) => {
+        if (err) throw err;
+        await console.table(res);
+    });
+};
+
   
 
-
 const runPrompts = () => {
+    
     inquirer
       .prompt({
         name: "action",
@@ -69,6 +101,7 @@ const runPrompts = () => {
 
 // ? VIEW RECORDS PROMPTS AND FUNCTIONS //
 const viewRecords = () => {
+    
     inquirer
       .prompt({
         name: "action",
@@ -87,7 +120,7 @@ const viewRecords = () => {
             switch (answer.action) {
                 
                 case "View All Employees":
-
+                    
                     viewEmployees();
                     break;
 
@@ -120,6 +153,17 @@ const viewRecords = () => {
 };
         
 const viewEmployees = () => {
+    console.clear() 
+    figlet('Employees', function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
+
     const query = "SELECT id, first_name, last_name, role_title FROM employee"
     connection.query(query, (err, res) => {
         res.forEach(({id, first_name, last_name , role_title})=> {
@@ -130,6 +174,17 @@ const viewEmployees = () => {
 };
 
 const viewDepartments = () => {
+    console.clear() 
+    figlet('Departments', function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
+
     const query = "SELECT id, department_name, department_lead FROM departments"
     connection.query(query, (err, res) => {
         res.forEach(({id, department_name, department_lead})=> {
@@ -140,6 +195,17 @@ const viewDepartments = () => {
 };
 
 const viewRoles = () => {
+     console.clear() 
+    figlet('Roles', function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
+
     const query = "SELECT id, title, salary FROM role"
     connection.query(query, (err, res) => {
         res.forEach(({id, title, salary})=> {
@@ -150,11 +216,13 @@ const viewRoles = () => {
 };
 
 const viewByManger = () => {
+    console.clear() 
    /*  const query = "SELECT id, first_name, last_name, manager_id FROM employee"
     connection.query(query, (err, res) => {
         res.forEach(({id, first_name, last_name})=> {
             console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`) */
     connection.query('SELECT * FROM employee', (err, results) => {
+    
         if (err) throw err;
 
         let query = 'SELECT id, first_name, last_name, role_title FROM employee '
@@ -176,14 +244,22 @@ const viewByManger = () => {
             }
           ])
           .then((answers) => {
-            console.clear()
+            console.clear() 
+            figlet(`${answers.manager}'s Team`, function(err, data) {
+                if (err) {
+                    console.log('Something went wrong...');
+                    console.dir(err);
+                    return;
+                }
+                console.clear() 
+                console.log(data)
+            });
           
-           
             connection.query(query, [answers.manager], (err, res) => {
-                console.log(res)
+              /*   console.log(res)
                 console.log(query)
                 console.log(answers)
-                console.log(answers.manager)
+                console.log(answers.manager) */
               if (res.length < 1){
                 console.log("No Employees under this management... Add one!!!")
                 runPrompts();
@@ -202,7 +278,9 @@ const viewByManger = () => {
 };
 
 const viewByDepartment = () => {
+    console.clear() 
     connection.query('SELECT * FROM departments', (err, results) => {
+        
         if (err) throw err;
 
         let query = 'SELECT departments.department_name, role.title, employee.first_name, employee.last_name ';
@@ -226,9 +304,19 @@ const viewByDepartment = () => {
           ])
            
             .then((answers) => {
-              console.clear()
+                console.clear() 
+                figlet(`$${answers.department} Team`, function(err, data) {
+                    if (err) {
+                        console.log('Something went wrong...');
+                        console.dir(err);
+                        return;
+                    }
+                    console.clear() 
+                    console.log(data)
+                });
+
               connection.query(query, [answers.department], (err, res) => {
-                console.log(res)
+              /*   console.log(res) */
                 if (res.length < 1){
                   console.log("No Employees in this department... Add one!!!")
                   runPrompts();
@@ -256,6 +344,7 @@ const viewByDepartment = () => {
 
 // ? ADD RECORDS PROMPTS AND FUNCTIONS //
 const addRecords = () => {
+    
     inquirer
       .prompt({
         name: "action",
@@ -296,6 +385,7 @@ const addRecords = () => {
 
 const addEmployee = () => {
     connection.query('SELECT * FROM role', async (err, results) => {
+        
         if (err) throw err;
    
         
@@ -331,6 +421,18 @@ const addEmployee = () => {
         }
       ])
       .then((answer)=>{
+        console.clear() 
+        figlet(`$Welcome ${answer.firstName}`, function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.clear() 
+            console.log(data)
+        });
+
+
         connection.query('INSERT INTO employee SET ?',
         {
           first_name: answer.firstName,
@@ -341,7 +443,7 @@ const addEmployee = () => {
         (err, res) => {
           if (err) throw err;
             // affectedrows calls on the rows affected
-          console.log(`Employee ${answer.firstName}  ${answer.lastName} inserted!\n`);
+          console.log(`Employee ${answer.firstName} ${answer.lastName} was added to the ${answer.roleTitle} Team!\n`);
           runPrompts();
         });
     });
@@ -352,6 +454,7 @@ const addEmployee = () => {
 const addRole = () => {
     //connect to role table for department data
     connection.query('SELECT * FROM departments', async (err, results) => {
+        
         if (err) throw err;
    
             
@@ -389,6 +492,17 @@ const addRole = () => {
     ])
 
     .then((answer)=>{
+        console.clear() 
+        figlet(`$${answer.rolenName} Added`, function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.clear() 
+            console.log(data)
+        });
+
             connection.query('INSERT INTO role SET ?',
             {
                 title: answer.rolenName,
@@ -399,7 +513,7 @@ const addRole = () => {
             if (err) throw err;
 
 
-            console.log(`Role ${answer.rolenName} added under ${answer.roleDepartment} !\n`);
+            console.log(`Role ${answer.rolenName} was added under ${answer.roleDepartment} !\n`);
             runPrompts();
             });
         });
@@ -408,6 +522,7 @@ const addRole = () => {
 
 
 const addDepartment = () => {
+    
     inquirer
         .prompt([
             {
@@ -422,6 +537,18 @@ const addDepartment = () => {
             },
         ])
         .then((answer) => {
+            console.clear() 
+            figlet(`$${answer.deptName} Added`, function(err, data) {
+                if (err) {
+                    console.log('Something went wrong...');
+                    console.dir(err);
+                    return;
+                }
+                console.clear() 
+                console.log(data)
+            });
+
+            
             connection.query(
                 'INSERT INTO departments SET?',
                 {
@@ -431,7 +558,8 @@ const addDepartment = () => {
 
                 async (err, res) => {
                     if (err) throw err;
-                    await console.log("Department and Lead were added!!!")
+                    await console.log(`${answer.deptName} was added!!!`)
+                    await console.log(`Is now being Lead by ${answer.deptLead}!!!`)
                     await runPrompts();
                 })
 
@@ -445,6 +573,7 @@ const addDepartment = () => {
 
 // ? UPDATE RECORDS PROMPTS AND FUNCTIONS //
 const updateRecords = () => {
+    
     inquirer
         .prompt([
             {
@@ -477,124 +606,102 @@ const updateRecords = () => {
 };
 
 const updateEmployee = async () => {
-    try {
-        const employeeUpdate = await inquirer
-            .prompt([
-            {
-                name: 'firstname',
-                type: 'input',
-                message: 'What is the first name of the employee you would you like to update?'
-            },
-            {
-                name: 'lastname',
-                type: 'input',
-                message: 'What is the last name of the employee you would you like to update?'
-            },
-            {
-                name: 'updateAnswers',
-                type: 'list',
-                message: 'What field would you like to update?',
-                choices: ['first_name', 'last_name', 'job_title', 'manager',],
-            },
+    console.clear() 
+    tablelog();
+    console
+    let query = 'SELECT role.title, role.id, employee.id, employee.first_name, employee.last_name, employee.role_title ';
+      query += 'FROM role INNER JOIN employee ON (employee.role_title = role.title)';
+      connection.query(query, async (err, results) => {
+        if (err) throw err;
 
-            {
-                name: 'updatedinfo',
-                type: 'input',
-                message: 'Enter the new information.',
-            }, 
+        try {
+            const employeeUpdate = await inquirer
+                .prompt([
+                {
+                    name: 'employee',
+                    type: 'list',
+                    choices() {
+                    const employeeArray = []
+                    results.forEach(({ id, first_name, last_name }) => {
+                    employeeArray.push(`${id} ${first_name} ${last_name}`);
+                    })
+                    return employeeArray
+        
+                    },
+                    message: 'Which employee would you like to update?'
+                    },
 
+                {
+                    name: 'updateAnswers',
+                    type: 'list',
+                    message: 'What field would you like to update?',
+                    choices: ['First Name', 'Last Name', 'Job Title', 'Manager',],
+                },
 
-            /* {
-                name: 'firstName',
-                type: 'input',
-                message: 'What is the employees first name?'
-              },
-              {
-                name: 'lastName',
-                type: 'input',
-                message: 'What is the employees last name?'
-              },
-              
-              {
-                  name: 'roleTitle',
-                  type: 'list',
-                  message: `What is this employees role?
-                  `,
-                  choices: [
-                      "Software Engineer",
-                      "Sales Representative",
-                      "Customer Success Representative",
-                  ]
-      
-              },
-              
-              {
-                name: 'manager',
-                type: 'input',
-                message: 'What is the employees managers name?'
-              } */
-        ])
-         let updateAnswers = employeeUpdate.updateAnswers;
-         let updatedInfo = employeeUpdate.updatedinfo;
-         let firstName = employeeUpdate.firstname; 
-         let lastName = employeeUpdate.lastname; 
-         let query;
-         console.log(employeeUpdate);
+                {
+                    name: 'updatedinfo',
+                    type: 'input',
+                    message: 'Enter the new information.',
+                }, 
 
-        switch (updateAnswers) {
-            case 'first_name':
-                query = `UPDATE employee SET first_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
-                break;
-
-
-             case 'last_name':
-                query = `UPDATE employee SET last_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
-                break;
-
-            case 'job_title':
-                query = `UPDATE employee SET job_title = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
-                break;
-
-            case 'manager':
-                query = `UPDATE employee SET manager = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
-                break;
-
-            default:
-                console.log(`Cannot update ${updateAnswers}`);
-        };
-        console.log(query);
-
-        connection.query(query, async (err, res) => {
-            if (err) throw err;
-            await console.table(`${res.affectedRows} record updated!\n`);
-            console.log(`Employee ${employeeUpdate.firstname}${employeeUpdate.lastname} was updated!\n`);
+            ])
+            let updateAnswers = employeeUpdate.updateAnswers;
+            let updatedInfo = employeeUpdate.updatedinfo;
+            // split asnwer array and gave each index a variable 
+            let employeeArr = employeeUpdate.employee.split(' ');
+            let firstName = employeeArr[1];
+            let lastName =employeeArr[2];
+            let query;
+            /* console.log(employeeUpdate); */
             
-            runPrompts();
-        });
-    } catch (error) { console.log(error) };
+            switch (updateAnswers) {
+                case 'First Name':
+                    query = `UPDATE employee SET first_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                    break;
 
+                case 'Last Name':
+                    query = `UPDATE employee SET last_name = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                    break;
+
+                case 'Job Title':
+                   
+                   
+                    query = `UPDATE employee SET role_title = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                    break;
+
+                case 'Manager':
+                    query = `UPDATE employee SET manager = '${updatedInfo}' WHERE (first_name, last_name)=('${firstName}','${lastName}')`
+                    break;
+
+                default:
+                    console.log(`Cannot update ${updateAnswers}`);
+            };
+            /* console.log(query); */
+            console.clear() 
+                figlet(`$Employee Updated`, function(err, data) {
+                    if (err) {
+                        console.log('Something went wrong...');
+                        console.dir(err);
+                        return;
+                    }
+                    console.clear() 
+                    console.log(data)
+                });
+            connection.query(query, async (err, res) => {
+                if (err) throw err;
+                await console.table(`${res.affectedRows} record updated!\n`);
+                console.log(`Employee ${employeeUpdate.employee} was updated!\n`);
+                
+                runPrompts();
+            });
+        } catch (error) { console.log(error) };
+    });
     };
 
-/* 
-
-        .then((answer) => {
-            connection.query('UPDATE INTO employee SET ? WHERE (first_name, last_name)',
-                {
-                first_name: answer.firstName,
-                last_name: answer.lastName,
-                role_title : answer.roleTitle,
-                manager: answer.manager,
-                },
-                (err, res) => {
-                if (err) throw err;
-
-                console.log(`Employee ${answer.firstName}  ${answer.lastName} was updated!\n`);
-                runPrompts();
-                });
-            }); */
 
 const updateRoles = () => {
     connection.query('SELECT * FROM role', async (err, results) => {
+        
         if (err) throw err;
         await inquirer
             .prompt([
@@ -658,6 +765,7 @@ const updateRoles = () => {
 const updateDepartment = async () => {
     
         connection.query('SELECT * FROM departments', async (err, results) => {
+            
             if (err) throw err;
             /* const depUpdate = await inquirer */
 
@@ -790,6 +898,7 @@ const updateDepartment = async () => {
 // ? DELETE RECORDS PROMPTS AND FUNCTIONS //
 
 const removeRecords = () => {
+    
     inquirer
       .prompt({
         name: "action",
@@ -808,6 +917,7 @@ const removeRecords = () => {
                 case  "Remove Employee":
 
                    connection.query('SELECT * FROM employee', (err, results) => {
+                    console.clear()
                     if (err) throw err;
                     inquirer.prompt([
                       {
@@ -848,6 +958,7 @@ const removeRecords = () => {
                 case "Remove Role":
                     
                    connection.query('SELECT * FROM role', (err, results) => {
+                    console.clear()
                     if (err) throw err;
                     inquirer.prompt([
                       {
@@ -888,6 +999,7 @@ const removeRecords = () => {
                 case  "Remove Department":
                     
                    connection.query('SELECT * FROM departments', (err, results) => {
+                    console.clear()
                     if (err) throw err;
                     inquirer.prompt([
                       {
