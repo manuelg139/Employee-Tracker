@@ -77,6 +77,7 @@ const viewRecords = () => {
         choices: [
             "View All Employees",
             "View All Employees by Manger",
+            "View All Employees by Department",
             "View All Roles",
             "View All Departments",
             "Back to Menu",
@@ -93,6 +94,12 @@ const viewRecords = () => {
                 case "View All Employees by Manger":
                     viewByManger();
                     break;
+
+                   
+                case  "View All Employees by Department":
+                    viewByDepartment();
+                break;
+
 
                 case "View All Roles":
                         viewRoles();
@@ -143,16 +150,101 @@ const viewRoles = () => {
 };
 
 const viewByManger = () => {
-    const query = "SELECT id, first_name, last_name, manager_id FROM employee"
+   /*  const query = "SELECT id, first_name, last_name, manager_id FROM employee"
     connection.query(query, (err, res) => {
         res.forEach(({id, first_name, last_name})=> {
-            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`)
-        });
-    runPrompts();
-    });
+            console.log(`ID: ${id}|| Full Name: ${first_name} ${last_name}`) */
+    connection.query('SELECT * FROM employee', (err, results) => {
+        if (err) throw err;
+
+        let query = 'SELECT id, first_name, last_name, role_title FROM employee '
+        query += ' WHERE employee.manager = ?'
+
+        inquirer.prompt([
+            {
+              name: 'manager',
+              type: 'list',
+              choices() {
+                const viewManArray = []
+                results.forEach(({manager}) => {
+                    viewManArray.push(manager);
+                });
+                let viewByManArray = viewManArray;
+                return viewByManArray
+              },
+              message: 'Which Manager Records would you like to view?'
+            }
+          ])
+          .then((answers) => {
+            console.clear()
+          
+           
+            connection.query(query, [answers.manager], (err, res) => {
+                console.log(res)
+                console.log(query)
+                console.log(answers)
+                console.log(answers.manager)
+              if (res.length < 1){
+                console.log("No Employees under this management... Add one!!!")
+                runPrompts();
+              }
+              else{
+              // Going to push the department data into a table
+              console.log(`Here are the employees under ${answers.manager}`)
+              console.table(res)
+              //Return to the main prompt
+              runPrompts();
+              }
+            })
+          }
+          )
+      })
 };
 
+const viewByDepartment = () => {
+    connection.query('SELECT * FROM departments', (err, results) => {
+        if (err) throw err;
 
+        let query = 'SELECT departments.department_name, role.title, employee.first_name, employee.last_name ';
+        query += 'FROM departments INNER JOIN role ON (department_name = role.department) INNER JOIN employee ON (employee.role_title = role.title)';
+        query += 'WHERE departments.department_name = ?'
+        
+        inquirer.prompt([
+            {
+              name: 'department',
+              type: 'list',
+              choices() {
+                const viewDepArray = []
+                results.forEach(({ department_name }) => {
+                    viewDepArray.push(department_name);
+                });
+                let viewByDepArray = viewDepArray;
+                return viewByDepArray
+              },
+              message: 'Which department would you like to view?'
+            }
+          ])
+           
+            .then((answers) => {
+              console.clear()
+              connection.query(query, [answers.department], (err, res) => {
+                console.log(res)
+                if (res.length < 1){
+                  console.log("No Employees in this department... Add one!!!")
+                  runPrompts();
+                }
+                else{
+                // Going to push the department data into a table
+                console.log(`Here are the employees in ${answers.department}`)
+                console.table(res)
+                //Return to the main prompt
+                runPrompts();
+                }
+              })
+            }
+            )
+        })
+};
 
 
 
@@ -564,9 +656,6 @@ const updateRoles = () => {
     });
 };
 
-
-
-
 const updateDepartment = async () => {
     
         connection.query('SELECT * FROM departments', async (err, results) => {
@@ -630,7 +719,6 @@ const updateDepartment = async () => {
                     });
         });            
 };
-
 
 // OTHER UPDATE CODE
 /* 
