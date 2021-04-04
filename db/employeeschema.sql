@@ -15,12 +15,13 @@ VALUES
 ("Big Picture", "Michael Scott"),
 ("Human Resources", "Sean McDonald"),
 ("Finnance", "Angela Martin"),
-("Production ", "Derryl Philbin"),
+("Production ", "Derryl Philbin")
 
 /* ADDING ROLES */
 INSERT INTO role (title, salary, department)
 VALUES 
 ("Software Engineer", 120000, "Engineering"),
+("General Manager", 120000, "Engineering"),
 ("Jr Engineer", 80000, "Engineering"),
 ("Sales Manager", 70000, "Sales"),
 ("Sales Representative", 60000, "Sales"),
@@ -35,8 +36,7 @@ VALUES
 ("Account Manager", 70000, "Finance"),
 ("Accountant", 55000, "Finance"),
 ("Production Manager", 75000, "Production"),
-("Intern", 25000, "Big Picture"),
-
+("Intern", 25000, "Big Picture")
 
 
 
@@ -45,6 +45,7 @@ VALUES
 INSERT INTO employee (first_name, last_name, role_title, manager)
 VALUES 
 ("Manuel", "Gonzalez", "Software Engineer", "Natalie"),
+("Michael", "Scott", "General Manager", "Michael"),
 ("Ryan", "Howard", "Software Engineer", "Natalie"),
 ("Jim", "Halper", "Sales Manager", "Jim" ),
 ("Dwight", "Shrute", "Sales Representative", "Jim" ),
@@ -63,7 +64,7 @@ VALUES
 ("Creed", "Bratton", "HR Representative", "Sean" ),
 ("Clark", "Green", "Intern", "Michael" ),
 ("Pete", "Miller", "Intern", "Michael" ),
-("Darryl", "Phinbin", "Production Manager, "Darryl"),
+("Darryl", "Phinbin", "Production Manager", "Darryl")
 
 
 
