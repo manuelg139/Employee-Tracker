@@ -92,7 +92,17 @@ const runPrompts = () => {
                     break;
 
                 case "Exit":
-                    console.log("Goodbye");
+                    console.clear() 
+                    figlet(`$GOODBYE`, function(err, data) {
+                        if (err) {
+                            console.log('Something went wrong...');
+                            console.dir(err);
+                            return;
+                        }
+                        console.clear() 
+                        console.log(data)
+                        console.log(`Press 'control' + C to extit Port`)
+                    });
     };
     });
 };
@@ -147,7 +157,17 @@ const viewRecords = () => {
                         break;
 
                 case "Exit":
-                    console.log("Goodbye");
+                    console.clear() 
+                        figlet(`$GOODBYE`, function(err, data) {
+                            if (err) {
+                                console.log('Something went wrong...');
+                                console.dir(err);
+                                return;
+                            }
+                            console.clear() 
+                            console.log(data)
+                            console.log(`Press 'control' + C to extit Port`)
+                        });
                 };
             });
 };
@@ -377,7 +397,17 @@ const addRecords = () => {
                         break;
 
                 case "Exit":
-                    console.log("Goodbye");
+                    console.clear() 
+                    figlet(`$GOODBYE`, function(err, data) {
+                        if (err) {
+                            console.log('Something went wrong...');
+                            console.dir(err);
+                            return;
+                        }
+                        console.clear() 
+                        console.log(data)
+                        console.log(`Press 'control' + C to extit Port`)
+                    });
                 };
             });
         };
@@ -597,6 +627,23 @@ const updateRecords = () => {
                     updateDepartment();
                     break;
 
+                case "Back to Menu":
+                    runPrompts();
+                    break;
+    
+                case "Exit":
+                        console.clear() 
+                        figlet(`$GOODBYE`, function(err, data) {
+                            if (err) {
+                                console.log('Something went wrong...');
+                                console.dir(err);
+                                return;
+                            }
+                            console.clear() 
+                            console.log(data)
+                            console.log(`Press 'control' + C to extit Port`)
+                        });
+
                 default:
                     console.log(`Invalid action: ${answer.updaterec}`)
 
@@ -687,6 +734,7 @@ const updateEmployee = async () => {
                     console.clear() 
                     console.log(data)
                 });
+                
             connection.query(query, async (err, res) => {
                 if (err) throw err;
                 await console.table(`${res.affectedRows} record updated!\n`);
@@ -697,7 +745,6 @@ const updateEmployee = async () => {
         } catch (error) { console.log(error) };
     });
     };
-
 
 const updateRoles = () => {
     connection.query('SELECT * FROM role', async (err, results) => {
@@ -742,6 +789,17 @@ const updateRoles = () => {
                 
             ])
             .then((answer) => {
+                console.clear() 
+                figlet(`$Role Updated`, function(err, data) {
+                    if (err) {
+                        console.log('Something went wrong...');
+                        console.dir(err);
+                        return;
+                    }
+                    console.clear() 
+                    console.log(data)
+                });
+
                 const query = `UPDATE role SET ${answer.updatetype} = '${answer.updateinfo}' WHERE ?`
                 
                 //selecting where to add the new qiery
@@ -754,7 +812,7 @@ const updateRoles = () => {
                     ],
                     async (err, res) => {
                         if (err) throw err;
-                        await console.table(`${res.affectedRows} record updated!\n`);
+                        await console.table(`${answer.role} was updated!!!\n`);
                         runPrompts();
                       
                     });
@@ -804,7 +862,17 @@ const updateDepartment = async () => {
                     ])
                     
                     .then((depUpdate)=>{ 
-                        
+                        console.clear() 
+                        figlet(`$Department Updated`, function(err, data) {
+                            if (err) {
+                                console.log('Something went wrong...');
+                                console.dir(err);
+                                return;
+                            }
+                            console.clear() 
+                            console.log(data)
+                        });
+
                         const query = `UPDATE departments SET ${depUpdate.updateitem} = '${depUpdate.updateinfo}' WHERE ?`
                         
                         //selecting where to add the new qiery
@@ -818,7 +886,7 @@ const updateDepartment = async () => {
                             async (err, res) => {
                                 if (err) throw err;
                                 await console.table(`${depUpdate.department} record updated!\n`)
-                                await console.table('NEW '+ depUpdate.updateitem + ' -- ' + depUpdate.updateinfo )
+                              /*   await console.table('NEW '+ depUpdate.updateitem + ' -- ' + depUpdate.updateinfo ) */
                                 
                                 runPrompts();
                             }
@@ -898,6 +966,17 @@ const updateDepartment = async () => {
 // ? DELETE RECORDS PROMPTS AND FUNCTIONS //
 
 const removeRecords = () => {
+    console.clear() 
+    figlet(`$Employee Tracker`, function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
+
     
     inquirer
       .prompt({
@@ -1042,7 +1121,17 @@ const removeRecords = () => {
                         break;
 
                 case "Exit":
-                    console.log("Goodbye");
+                    console.clear() 
+                    figlet(`$GOODBYE`, function(err, data) {
+                        if (err) {
+                            console.log('Something went wrong...');
+                            console.dir(err);
+                            return;
+                        }
+                        console.clear() 
+                        console.log(data)
+                        console.log(`Press 'control' + C to extit Port`)
+                    });
                 };
             });
         };
