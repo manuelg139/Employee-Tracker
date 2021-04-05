@@ -111,6 +111,16 @@ const runPrompts = () => {
 
 // ? VIEW RECORDS PROMPTS AND FUNCTIONS //
 const viewRecords = () => {
+    console.clear() 
+    figlet(`$Employee Tracker`, function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
     
     inquirer
       .prompt({
@@ -119,7 +129,7 @@ const viewRecords = () => {
         message: "Which Records would you like to display?",
         choices: [
             "View All Employees",
-            "View All Employees by Manger",
+            "View All Employees by Manager",
             "View All Employees by Department",
             "View All Roles",
             "View All Departments",
@@ -134,7 +144,7 @@ const viewRecords = () => {
                     viewEmployees();
                     break;
 
-                case "View All Employees by Manger":
+                case "View All Employees by Manager":
                     viewByManger();
                     break;
 
@@ -237,6 +247,15 @@ const viewRoles = () => {
 
 const viewByManger = () => {
     console.clear() 
+    figlet(`$Managers`, function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
    /*  const query = "SELECT id, first_name, last_name, manager_id FROM employee"
     connection.query(query, (err, res) => {
         res.forEach(({id, first_name, last_name})=> {
@@ -299,6 +318,17 @@ const viewByManger = () => {
 
 const viewByDepartment = () => {
     console.clear() 
+    figlet(`$Departments`, function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.clear() 
+        console.log(data)
+    });
+
+
     connection.query('SELECT * FROM departments', (err, results) => {
         
         if (err) throw err;
