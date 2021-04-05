@@ -35,11 +35,14 @@ https://github.com/manuelg139/Employee-Tracker
 ## Usage
 
 - After installation kick off the program by runing 'npm start' or 'node employee-department.js' in the termial at a root folder level.
-  -Navigating the prompteed options you will be able to Add, Remove, Update and View all of your company's records.
+- Navigating the prompteed options you will be able to Add, Remove, Update and View all of your company's records.
+- Press the Control + C keys on your keyboard to exit the Port on your terminal.
 
 ## Media
+
 ![Employee-Tracker-1](https://user-images.githubusercontent.com/75399668/113626882-52fb6f00-9628-11eb-85b2-57ced6c176c3.gif)
 
+(Video Walkthrough: https://drive.google.com/file/d/1DaiV_RXKHZgTVoDx9Ml2KKFJSTYK6wyt/view?usp=sharing)
 
 ## Technologies Used
 
