@@ -38,8 +38,8 @@ https://github.com/manuelg139/Employee-Tracker
   -Navigating the prompteed options you will be able to Add, Remove, Update and View all of your company's records.
 
 ## Media
-![Employee-Tracker](https://user-images.githubusercontent.com/75399668/113625494-9ead1900-9626-11eb-816e-607575828efc.gif)
-- Video Link (https://drive.google.com/file/d/15F_sR7TpAD6ONO485fAXeLR4_z0EYOHw/view?usp=sharing)
+![Employee-Tracker-1](https://user-images.githubusercontent.com/75399668/113626882-52fb6f00-9628-11eb-85b2-57ced6c176c3.gif)
+
 
 ## Technologies Used
 
